@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xml>
+    <appId>wx54ffbc02f0621c57</appId>
+    <secret>b6d96c7b7d5be0404f7c6fc61e792fed </secret>
+    <token>wxtoken</token>
+    <aesKey>KgwVOifMrDO0tQNbzdoeWP6abSF2MIN97UuSlZDLrAI</aesKey>
+    <accessToken></accessToken>
+    <expiresTime>7200</expiresTime>
+    <openId>某个加你公众号的用户的openId</openId>
+    <oauth2redirectUri>网页授权获取用户信息回调地址</oauth2redirectUri>
+</xml>
