@@ -8,6 +8,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.filter.CharacterEncodingFilter;
 
+import com.chn.wx.MessageHandler;
+
 @Configuration
 public class WebConfiguration {
 
@@ -23,5 +25,9 @@ public class WebConfiguration {
     	characterEncodingFilter.setEncoding("UTF-8");
     	characterEncodingFilter.setForceEncoding(true);
     	return characterEncodingFilter;
+    }
+    @Bean
+    public MessageHandler getMessageHandler() throws Exception{
+    	return new MessageHandler();
     }
 }
