@@ -15,10 +15,13 @@ import org.dom4j.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.method.P;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.chn.common.HttpUtils;
 import com.chn.common.IOUtils;
@@ -28,6 +31,7 @@ import com.chn.wx.api.PlatFormManager;
 import com.chn.wx.api.PlatFormTokenAccessor;
 import com.chn.wx.dto.App;
 import com.chn.wx.dto.Context;
+import com.chn.wx.vo.result.PlatFormGetAuthInfoResult;
 import com.qq.weixin.mp.aes.AesException;
 import com.qq.weixin.mp.aes.WXBizMsgCrypt;
 
@@ -88,22 +92,23 @@ public class WechatPlatformController {
 	}
 
 	@RequestMapping("/callback")
-	public String callback(HttpServletRequest req) {
-		Context context = new Context(HttpUtils.decodeParams(req));
-		log.info(context.toString());
+	public String callback(@RequestParam(value="auth_code") String code,@RequestParam(value="expires_in") Integer expires) {
+		PlatFormGetAuthInfoResult authInfoResult = PlatFormManager.getAuthInfo(code);
 		return "callback";
 	}
 
 	@Autowired
 	MessageHandler messageHandler;
 
-	@RequestMapping("/wx")
-	public void wechat(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+	@RequestMapping(value={"/wx","wx/{appId}/wxmsg"})
+	public void wechat(@PathVariable String appId,HttpServletRequest req, HttpServletResponse resp) throws IOException {
 
 		Context context = new Context(HttpUtils.decodeParams(req));
 		context.setAttribute("method", req.getMethod());
 		if (req.getMethod().equalsIgnoreCase("POST"))
 			context.setAttribute("xmlContent", HttpUtils.read(req));
+		if (!StringUtils.isEmpty(appId))
+			context.addAttribute("AppId", appId);
 		OutputStream os = resp.getOutputStream();
 		log.info(context.toString());
 		try {
