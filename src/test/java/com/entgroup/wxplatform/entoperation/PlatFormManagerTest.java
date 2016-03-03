@@ -13,6 +13,10 @@ public class PlatFormManagerTest {
 	String authCode = "queryauthcode@@@YycvieQxYRo1v7PNUOib8ZSQezZOBWoneijnQOMHkZkAY5Qo6n1d6CsIs8QxOzz4mTlXzYc7NqLSIzKWG9zzkA";
 	String ticket = "ticket@@@rfxKo8Sh6aT76DWorfEt5h2rHepQ99i4DfTtY5i2fFJW-WSA-IcN5XElGGVWitwnAbSgnYzNmS10yRi1Bpc2nA";
 	@Test
+	public void testPlatFormAuth(){
+		PlatFormTokenAccessor.getAccessToken();
+	}
+	@Test
 	public void testAuthInfoResult(){
 		PlatFormTokenAccessor.updatePlatFormVerifyTicket(ticket);
 		PlatFormGetAuthInfoResult authInfo = PlatFormManager.getAuthInfo(authCode);
