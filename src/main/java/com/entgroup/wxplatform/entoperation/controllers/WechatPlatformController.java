@@ -125,8 +125,8 @@ public class WechatPlatformController {
 		context.setAttribute("method", req.getMethod());
 		if (req.getMethod().equalsIgnoreCase("POST"))
 			context.setAttribute("xmlContent", HttpUtils.read(req));
-		if (!StringUtils.isEmpty(appId))
-			context.addAttribute("AppId", appId);
+		//if (!StringUtils.isEmpty(appId))
+		//	context.addAttribute("AppId", appId);
 		OutputStream os = resp.getOutputStream();
 		log.info("请求参数："+context.toString());
 		try {
