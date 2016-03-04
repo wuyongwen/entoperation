@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	layout:decorator="layout/public">
+<head lang="en">
+<title>index page</title>
+<script
+	src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"
+	th:src="@{/webjars/jquery/2.1.4/jquery.min.js}"></script>
+<link
+	href="http://cdn.jsdelivr.net/webjars/bootstrap/3.3.4/css/bootstrap.min.css"
+	th:href="@{/webjars/bootstrap/3.3.4/css/bootstrap.min.css}"
+	rel="stylesheet" media="screen" />
+<link rel="stylesheet" type="text/css" media="screen"
+	href="../../css/common.css" th:href="@{/css/common.css}" />
+
+</head>
+<body>
+
+	<div id="page-wrapper" layout:fragment="content">
+		<div class="container" style="margin-top: 100px;">
+
+			<!-- Navigation -->
+			<nav class="navbar navbar-default navbar-fixed-top" role="navigation"
+				style="margin-bottom: 0">
+				<div class="navbar-header">
+					<a class="navbar-brand" href="index.html">主页</a>
+				</div>
+				<!-- /.navbar-header -->
+			</nav>
+		</div>
+		<div class="jumbotron">
+            <div class="row text-center">
+                <div class="">
+                    <h2>Spring Framework</h2>
+
+                    <h3>Spring Boot Web App</h3>
+                </div>
+            </div>
+            <div class="row text-center">
+                <img src="../../static/images/NewBannerBOOTS_2.png" width="400"
+                     th:src="@{/images/NewBannerBOOTS_2.png}"/>
+            </div>
+        </div>
+	</div>
+</body>
+</html>

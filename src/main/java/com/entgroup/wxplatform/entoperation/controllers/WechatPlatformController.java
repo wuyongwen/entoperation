@@ -36,7 +36,8 @@ public class WechatPlatformController {
 
 	@RequestMapping("/auth")
 	public String auth(Model model) {
-		String url = PlatFormManager.getLoginUrl();
+		//String url = PlatFormManager.getLoginUrl();
+		String url = "http://www.baidu.com";
 		model.addAttribute("url", url);
 		return "auth";
 	}

@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" layout:decorator="layout/default">
+<head>
+<title>auth Demo</title>
+</head>
+<body>
+	<div class="container" id="page-wrapper" layout:fragment="content">
+		<div class="container-fluid">
+			<div>
+				<span th:text="${url}"></span>
+				<h1>微信授权登录</h1>
+				<a th:href="${url}"><img src="./images/icon_button3_1.png" /></a>
+			</div>
+		</div>
+	</div>
+</body>
+</html>
