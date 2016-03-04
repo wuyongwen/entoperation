@@ -12,23 +12,23 @@ import com.chn.wx.vo.result.PlatFormGetAuthorizerInfoResult;
 public class PlatFormManagerTest {
 	String authCode = "queryauthcode@@@YycvieQxYRo1v7PNUOib8ZSQezZOBWoneijnQOMHkZkAY5Qo6n1d6CsIs8QxOzz4mTlXzYc7NqLSIzKWG9zzkA";
 	String ticket = "ticket@@@rfxKo8Sh6aT76DWorfEt5h2rHepQ99i4DfTtY5i2fFJW-WSA-IcN5XElGGVWitwnAbSgnYzNmS10yRi1Bpc2nA";
-	@Test
+	//@Test
 	public void testPlatFormAuth(){
 		PlatFormTokenAccessor.getAccessToken();
 	}
-	@Test
+	//@Test
 	public void testAuthInfoResult(){
 		PlatFormTokenAccessor.updatePlatFormVerifyTicket(ticket);
 		PlatFormGetAuthInfoResult authInfo = PlatFormManager.getAuthInfo(authCode);
 		System.out.println(JSON.toJSONString(authInfo));
 	}
-	@Test
+	//@Test
 	public void testGtAuthAccessToken(){
 		PlatFormTokenAccessor.updatePlatFormVerifyTicket(ticket);
 		PlatFormAccessTokenResult accessToken = PlatFormManager.getAuthAccessToken("wx54ffbc02f0621c57", "refreshtoken@@@dBYXdJhdJHHdYFD9sEvMUgICEIAHvoo7s4at4gRLeYE");
 		System.out.println(JSON.toJSONString(accessToken));
 	}
-	@Test
+	//@Test
 	public void testgetAuthorizerInfo(){
 		PlatFormTokenAccessor.updatePlatFormVerifyTicket(ticket);
 		PlatFormGetAuthorizerInfoResult authInfo = PlatFormManager.getAuthorizerInfo("wx54ffbc02f0621c57");

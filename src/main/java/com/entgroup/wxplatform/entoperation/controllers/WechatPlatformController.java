@@ -1,8 +1,10 @@
 package com.entgroup.wxplatform.entoperation.controllers;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import javax.net.ssl.SSLContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -23,6 +25,16 @@ import com.chn.wx.MessageHandler;
 import com.chn.wx.api.PlatFormManager;
 import com.chn.wx.dto.Context;
 import com.chn.wx.vo.result.PlatFormGetAuthInfoResult;
+import com.chn.wx.vo.result.PlatFormGetAuthorizerInfoResult;
+
+import me.chanjar.weixin.common.api.WxConsts;
+import me.chanjar.weixin.common.bean.WxAccessToken;
+import me.chanjar.weixin.common.exception.WxErrorException;
+import me.chanjar.weixin.mp.api.WxMpConfigStorage;
+import me.chanjar.weixin.mp.api.WxMpInMemoryConfigStorage;
+import me.chanjar.weixin.mp.api.WxMpService;
+import me.chanjar.weixin.mp.bean.WxMpMassGroupMessage;
+import me.chanjar.weixin.mp.bean.result.WxMpMassSendResult;
 
 /**
  * 微信平台请求处理Controller
@@ -36,19 +48,49 @@ public class WechatPlatformController {
 
 	@RequestMapping("/auth")
 	public String auth(Model model) {
-		//String url = PlatFormManager.getLoginUrl();
-		String url = "http://www.baidu.com";
+		String url = PlatFormManager.getLoginUrl();
 		model.addAttribute("url", url);
 		return "auth";
 	}
 
 	@RequestMapping("/callback")
-	public String callback(@RequestParam(value="auth_code") String code,@RequestParam(value="expires_in") Integer expires) {
+	public String callback(@RequestParam(value="auth_code") String code,@RequestParam(value="expires_in") Integer expires,Model model) {
 		PlatFormGetAuthInfoResult authInfoResult = PlatFormManager.getAuthInfo(code);
 		log.info("authInfo: "+JSON.toJSONString(authInfoResult));
+		model.addAttribute("authInfo", JSON.toJSONString(authInfoResult));
+		model.addAttribute("authToken",authInfoResult.getAuthorizationInfo().getAuthorizerAccessToken());
+		PlatFormGetAuthorizerInfoResult authorizeInfo = PlatFormManager.getAuthorizerInfo(authInfoResult.getAuthorizationInfo().getAuthorizerAppId());
+		log.info("authorizeInfo : {}" ,authorizeInfo);
+		model.addAttribute("authorizeInfo", JSON.toJSONString(authorizeInfo));
+		model.addAttribute("stat", null);
 		return "callback";
 	}
-
+	@Autowired
+	WxMpService wxMpService;
+	/**
+	 * 群发文本消息
+	 * @param authToken
+	 * @param msg
+	 * @param model
+	 * @return
+	 * @throws WxErrorException
+	 */
+	@RequestMapping("/sendAll")
+	public String sendAll(String authToken,String msg,Model model) throws WxErrorException{
+		WxMpInMemoryConfigStorage config = new WxMpInMemoryConfigStorage();
+		if(!StringUtils.isEmpty(authToken)){
+			config.updateAccessToken(authToken, 7200);
+			wxMpService.setWxMpConfigStorage(config);
+			WxMpMassGroupMessage gmsg = new WxMpMassGroupMessage();
+			gmsg.setMsgtype(WxConsts.MASS_MSG_TEXT);
+			gmsg.setContent(msg);
+			WxMpMassSendResult result = wxMpService.massGroupMessageSend(gmsg);
+			model.addAttribute("stat", result);
+		}
+		return "callback";
+	}
+	
+	
 	@Autowired
 	MessageHandler messageHandler;
 

@@ -31,7 +31,7 @@ import com.entgroup.wxplatform.entoperation.domain.UserRole;
 import com.entgroup.wxplatform.entoperation.repositories.UserRepository;
 import com.entgroup.wxplatform.entoperation.repositories.UserRoleRepository;
 
-//@Component
+@Component
 public class UserDataLoader implements ApplicationListener<ContextRefreshedEvent> {
 	
 	private Logger logger = Logger.getLogger(UserDataLoader.class);
@@ -44,7 +44,8 @@ public class UserDataLoader implements ApplicationListener<ContextRefreshedEvent
 
 	@Override
 	public void onApplicationEvent(ContextRefreshedEvent event) {
-		
+		long count = userRepository.count();
+		if(count>0) return;
 		User admin = new User();
 		admin.setUsername("admin");
 		admin.setPassword("123456");

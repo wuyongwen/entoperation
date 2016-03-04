@@ -16,8 +16,6 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
-import com.chn.wx.MessageHandler;
-
 @Configuration
 public class WebConfiguration extends WebMvcConfigurerAdapter{
 
@@ -34,10 +32,7 @@ public class WebConfiguration extends WebMvcConfigurerAdapter{
     	characterEncodingFilter.setForceEncoding(true);
     	return characterEncodingFilter;
     }
-    @Bean
-    public MessageHandler getMessageHandler() throws Exception{
-    	return new MessageHandler();
-    }
+    
     @Override
 	public void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer) {
 		configurer.enable();
