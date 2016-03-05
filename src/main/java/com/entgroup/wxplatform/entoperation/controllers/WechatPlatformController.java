@@ -1,12 +1,17 @@
 package com.entgroup.wxplatform.entoperation.controllers;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import javax.net.ssl.SSLContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import me.chanjar.weixin.common.api.WxConsts;
+import me.chanjar.weixin.common.exception.WxErrorException;
+import me.chanjar.weixin.mp.api.WxMpInMemoryConfigStorage;
+import me.chanjar.weixin.mp.api.WxMpService;
+import me.chanjar.weixin.mp.bean.WxMpMassGroupMessage;
+import me.chanjar.weixin.mp.bean.result.WxMpMassSendResult;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,15 +32,6 @@ import com.chn.wx.dto.Context;
 import com.chn.wx.vo.result.PlatFormGetAuthInfoResult;
 import com.chn.wx.vo.result.PlatFormGetAuthorizerInfoResult;
 
-import me.chanjar.weixin.common.api.WxConsts;
-import me.chanjar.weixin.common.bean.WxAccessToken;
-import me.chanjar.weixin.common.exception.WxErrorException;
-import me.chanjar.weixin.mp.api.WxMpConfigStorage;
-import me.chanjar.weixin.mp.api.WxMpInMemoryConfigStorage;
-import me.chanjar.weixin.mp.api.WxMpService;
-import me.chanjar.weixin.mp.bean.WxMpMassGroupMessage;
-import me.chanjar.weixin.mp.bean.result.WxMpMassSendResult;
-
 /**
  * 微信平台请求处理Controller
  * 
@@ -45,14 +41,24 @@ import me.chanjar.weixin.mp.bean.result.WxMpMassSendResult;
 @Controller
 public class WechatPlatformController {
 	public static Logger log = LoggerFactory.getLogger(WechatPlatformController.class);
-
+	/**
+	 * 授权登陆页
+	 * @param model
+	 * @return
+	 */
 	@RequestMapping("/auth")
 	public String auth(Model model) {
 		String url = PlatFormManager.getLoginUrl();
 		model.addAttribute("url", url);
 		return "auth";
 	}
-
+	/**
+	 * 授权成功回调
+	 * @param code
+	 * @param expires
+	 * @param model
+	 * @return
+	 */
 	@RequestMapping("/callback")
 	public String callback(@RequestParam(value="auth_code") String code,@RequestParam(value="expires_in") Integer expires,Model model) {
 		PlatFormGetAuthInfoResult authInfoResult = PlatFormManager.getAuthInfo(code);
