@@ -56,6 +56,8 @@ public class User {
 	@OneToMany(mappedBy = "user", cascade = {CascadeType.ALL}, fetch = FetchType.LAZY)
 	private Set<UserRole> userRoles;
 
+	@OneToMany(mappedBy = "user", cascade = {CascadeType.ALL}, fetch = FetchType.LAZY)
+	private Set<WxMpAPP> appsSet = new HashSet<WxMpAPP>(0);
 	/**
 	 * @return the userId
 	 */
@@ -152,6 +154,14 @@ public class User {
 	 */
 	public void setUserRoles(Set<UserRole> userRoles) {
 		this.userRoles = userRoles;
+	}
+
+	public Set<WxMpAPP> getAppsSet() {
+		return appsSet;
+	}
+
+	public void setAppsSet(Set<WxMpAPP> appsSet) {
+		this.appsSet = appsSet;
 	}
 
 	/* (non-Javadoc)

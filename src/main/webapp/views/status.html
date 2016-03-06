@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	layout:decorator="layout/default">
+<head lang="en">
+<title>auth Demo status</title>
+</head>
+<body>
+
+	<div class="container" id="page-wrapper" layout:fragment="content">
+		<div class="container-fluid">
+
+			<div th:text="${stat}"></div>
+		</div>
+	</div>
+</body>
+</html>

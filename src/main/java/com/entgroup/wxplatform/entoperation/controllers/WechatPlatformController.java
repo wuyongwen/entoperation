@@ -16,6 +16,8 @@ import me.chanjar.weixin.mp.bean.result.WxMpMassSendResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,6 +33,11 @@ import com.chn.wx.api.PlatFormManager;
 import com.chn.wx.dto.Context;
 import com.chn.wx.vo.result.PlatFormGetAuthInfoResult;
 import com.chn.wx.vo.result.PlatFormGetAuthorizerInfoResult;
+import com.entgroup.wxplatform.entoperation.domain.User;
+import com.entgroup.wxplatform.entoperation.domain.WxMpAPP;
+import com.entgroup.wxplatform.entoperation.domain.WxMpAPPInfo;
+import com.entgroup.wxplatform.entoperation.services.UserService;
+import com.entgroup.wxplatform.entoperation.services.WxMpAppService;
 
 /**
  * 微信平台请求处理Controller
@@ -40,9 +47,18 @@ import com.chn.wx.vo.result.PlatFormGetAuthorizerInfoResult;
  */
 @Controller
 public class WechatPlatformController {
-	public static Logger log = LoggerFactory.getLogger(WechatPlatformController.class);
+	public static Logger log = LoggerFactory
+			.getLogger(WechatPlatformController.class);
+
+	@Autowired
+	WxMpAppService mpsvr;
+	@Autowired
+	UserService usersvr;
+	@Autowired
+	WxMpService wxMpService;
 	/**
 	 * 授权登陆页
+	 * 
 	 * @param model
 	 * @return
 	 */
@@ -52,29 +68,51 @@ public class WechatPlatformController {
 		model.addAttribute("url", url);
 		return "auth";
 	}
+
 	/**
 	 * 授权成功回调
+	 * 
 	 * @param code
 	 * @param expires
 	 * @param model
 	 * @return
 	 */
 	@RequestMapping("/callback")
-	public String callback(@RequestParam(value="auth_code") String code,@RequestParam(value="expires_in") Integer expires,Model model) {
-		PlatFormGetAuthInfoResult authInfoResult = PlatFormManager.getAuthInfo(code);
-		log.info("authInfo: "+JSON.toJSONString(authInfoResult));
+	public String callback(@RequestParam(value = "auth_code") String code,
+			@RequestParam(value = "expires_in") Integer expires, Model model) {
+		PlatFormGetAuthInfoResult authInfoResult = PlatFormManager
+				.getAuthInfo(code);
+		log.info("authInfo: " + JSON.toJSONString(authInfoResult));
+		UserDetails userDetails = (UserDetails) SecurityContextHolder
+				.getContext().getAuthentication().getPrincipal();
+
+		PlatFormGetAuthorizerInfoResult authorizeInfo = PlatFormManager
+				.getAuthorizerInfo(authInfoResult.getAuthorizationInfo()
+						.getAuthorizerAppId());
+		if (mpsvr.findByAppId(authInfoResult.getAuthorizationInfo()
+				.getAuthorizerAppId()) == null) {
+			WxMpAPP app = new WxMpAPP();
+			app.setAuthorizationInfo(authInfoResult.getAuthorizationInfo());
+			User user = usersvr.findByUsername(userDetails.getUsername());
+			app.setUser(user);
+			WxMpAPPInfo info = new WxMpAPPInfo();
+			info.setAuthorizerInfor(authorizeInfo);
+			app.setInfoDetial(info);
+			mpsvr.saveBean(app);
+		}
+
 		model.addAttribute("authInfo", JSON.toJSONString(authInfoResult));
-		model.addAttribute("authToken",authInfoResult.getAuthorizationInfo().getAuthorizerAccessToken());
-		PlatFormGetAuthorizerInfoResult authorizeInfo = PlatFormManager.getAuthorizerInfo(authInfoResult.getAuthorizationInfo().getAuthorizerAppId());
-		log.info("authorizeInfo : {}" ,authorizeInfo);
+		model.addAttribute("authToken", authInfoResult.getAuthorizationInfo()
+				.getAuthorizerAccessToken());
+		log.info("authorizeInfo : {}", authorizeInfo);
 		model.addAttribute("authorizeInfo", JSON.toJSONString(authorizeInfo));
-		model.addAttribute("stat", null);
 		return "callback";
 	}
-	@Autowired
-	WxMpService wxMpService;
+
+
 	/**
 	 * 群发文本消息
+	 * 
 	 * @param authToken
 	 * @param msg
 	 * @param model
@@ -82,9 +120,10 @@ public class WechatPlatformController {
 	 * @throws WxErrorException
 	 */
 	@RequestMapping("/sendAll")
-	public String sendAll(String authToken,String msg,Model model) throws WxErrorException{
+	public String sendAll(String authToken, String msg, Model model)
+			throws WxErrorException {
 		WxMpInMemoryConfigStorage config = new WxMpInMemoryConfigStorage();
-		if(!StringUtils.isEmpty(authToken)){
+		if (!StringUtils.isEmpty(authToken)) {
 			config.updateAccessToken(authToken, 7200);
 			wxMpService.setWxMpConfigStorage(config);
 			WxMpMassGroupMessage gmsg = new WxMpMassGroupMessage();
@@ -93,22 +132,34 @@ public class WechatPlatformController {
 			WxMpMassSendResult result = wxMpService.massGroupMessageSend(gmsg);
 			model.addAttribute("stat", result);
 		}
-		return "callback";
+		return "status";
 	}
-	
-	
+	@RequestMapping("/myapp")
+	public String myApp(Model model){
+		UserDetails userDetails = (UserDetails) SecurityContextHolder
+				.getContext().getAuthentication().getPrincipal();
+		User user = usersvr.findByUsername(userDetails.getUsername());
+		model.addAttribute("user", user);
+		return "myapp";
+	}
 	@Autowired
 	MessageHandler messageHandler;
-
-	@RequestMapping(value={"/wx"})
-	public void wechat(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+	/**
+	 * 微信消息处理
+	 * @param req
+	 * @param resp
+	 * @throws IOException
+	 */
+	@RequestMapping(value = { "/wx" })
+	public void wechat(HttpServletRequest req, HttpServletResponse resp)
+			throws IOException {
 
 		Context context = new Context(HttpUtils.decodeParams(req));
 		context.setAttribute("method", req.getMethod());
 		if (req.getMethod().equalsIgnoreCase("POST"))
 			context.setAttribute("xmlContent", HttpUtils.read(req));
 		OutputStream os = resp.getOutputStream();
-		log.info("请求参数："+context.toString());
+		log.info("请求参数：" + context.toString());
 		try {
 			String responseString = messageHandler.process(context);
 			os.write(StringUtils.getBytesUtf8(responseString));
@@ -118,16 +169,19 @@ public class WechatPlatformController {
 			IOUtils.closeQuietly(os);
 		}
 	}
+
 	@RequestMapping("/wx/{appId}/wxmsg")
-	public void singleWechat(@PathVariable String appId,HttpServletRequest req, HttpServletResponse resp) throws IOException{
+	public void singleWechat(@PathVariable String appId,
+			HttpServletRequest req, HttpServletResponse resp)
+			throws IOException {
 		Context context = new Context(HttpUtils.decodeParams(req));
 		context.setAttribute("method", req.getMethod());
 		if (req.getMethod().equalsIgnoreCase("POST"))
 			context.setAttribute("xmlContent", HttpUtils.read(req));
-		//if (!StringUtils.isEmpty(appId))
-		//	context.addAttribute("AppId", appId);
+		// if (!StringUtils.isEmpty(appId))
+		// context.addAttribute("AppId", appId);
 		OutputStream os = resp.getOutputStream();
-		log.info("请求参数："+context.toString());
+		log.info("请求参数：" + context.toString());
 		try {
 			String responseString = messageHandler.process(context);
 			os.write(StringUtils.getBytesUtf8(responseString));
@@ -137,5 +191,5 @@ public class WechatPlatformController {
 			IOUtils.closeQuietly(os);
 		}
 	}
-	
+
 }
