@@ -7,27 +7,31 @@
 </head>
 <body>
 	<div id="page-wrapper" layout:fragment="content">
-		<div class="container">
-			<div th:if="${not #lists.isEmpty(user.appsSet)}">
-				<h2>APP List</h2>
-				<table class="table table-striped">
-					<tr>
-						<th>Id</th>
-						<th>accessToken</th>
-						<th>expriesIn</th>
-						<th>refreshToken</th>
-						<th>View</th>
-						<th>Edit</th>
-					</tr>
-					<tr th:each="app : ${user.appsSet}">
-						<td th:text="${app.appId}"><a href="/myapp/${app.appId}">Id</a></td>
-						<td th:text="${app.accessToken}">accessToken</td>
-						<td th:text="${app.expriesIn}">expriesIn</td>
-						<td th:text="${app.refreshToken}">refreshToken</td>
-						<td><a th:href="${ '/myapp/' + app.appId}">View</a></td>
-						<td><a th:href="${'/myapp/edit/' + app.appId}">Edit</a></td>
-					</tr>
-				</table>
+		<div class="container-fluid">
+			<div class="row">
+				<div th:if="${not #lists.isEmpty(user.appsSet)}"  class="table-responsive">
+					<h2>授权的公众号</h2>
+					<table class="table table-hover">
+						<tr>
+							<th>ID</th>
+							<th>APPID</th>
+							<th>accessToken</th>
+							<th>expriesIn</th>
+							<th>refreshToken</th>
+							<th>View</th>
+							<th>Edit</th>
+						</tr>
+						<tr th:each="app : ${user.appsSet}">
+							<td th:text="${app.id}"><a href="/myapp/${app.id}">APPID</a></td>
+							<td th:text="${app.appId}">APPID</td>
+							<td th:text="${app.accessToken}">accessToken</td>
+							<td th:text="${app.expriesIn}">expriesIn</td>
+							<td th:text="${app.refreshToken}">refreshToken</td>
+							<td><a th:href="${ '/myapp/' + app.appId}">View</a></td>
+							<td><a th:href="${'/myapp/edit/' + app.appId}">Edit</a></td>
+						</tr>
+					</table>
+				</div>
 			</div>
 		</div>
 	</div>

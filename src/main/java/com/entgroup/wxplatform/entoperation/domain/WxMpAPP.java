@@ -92,6 +92,14 @@ public class WxMpAPP {
 		this.infoDetial = infoDetial;
 	}
 
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
 	public void setAuthorizationInfo(AuthorizationInfo authorizationInfo) {
 		this.accessToken = authorizationInfo.getAuthorizerAccessToken();
 		this.appId = authorizationInfo.getAuthorizerAppId();
@@ -101,5 +109,7 @@ public class WxMpAPP {
 					+ (Integer.parseInt(expiresIn) - 200) * 1000l;
 		this.refreshToken = authorizationInfo.getAuthorizerRefreshToken();
 	}
-
+	public boolean isExpriesIn(){
+		return System.currentTimeMillis() > this.expriesIn;
+	}
 }

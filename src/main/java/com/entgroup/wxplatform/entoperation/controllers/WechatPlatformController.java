@@ -1,17 +1,24 @@
 package com.entgroup.wxplatform.entoperation.controllers;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import me.chanjar.weixin.common.api.WxConsts;
+import me.chanjar.weixin.common.bean.result.WxMediaUploadResult;
 import me.chanjar.weixin.common.exception.WxErrorException;
+import me.chanjar.weixin.common.util.fs.FileUtils;
 import me.chanjar.weixin.mp.api.WxMpInMemoryConfigStorage;
 import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.bean.WxMpMassGroupMessage;
+import me.chanjar.weixin.mp.bean.WxMpMaterial;
+import me.chanjar.weixin.mp.bean.WxMpMaterialNews;
 import me.chanjar.weixin.mp.bean.result.WxMpMassSendResult;
+import me.chanjar.weixin.mp.bean.result.WxMpMaterialUploadResult;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +29,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.alibaba.fastjson.JSON;
 import com.chn.common.HttpUtils;
@@ -31,6 +41,8 @@ import com.chn.common.StringUtils;
 import com.chn.wx.MessageHandler;
 import com.chn.wx.api.PlatFormManager;
 import com.chn.wx.dto.Context;
+import com.chn.wx.vo.result.PlatFormAccessTokenResult;
+import com.chn.wx.vo.result.PlatFormGetAuthAccessResult;
 import com.chn.wx.vo.result.PlatFormGetAuthInfoResult;
 import com.chn.wx.vo.result.PlatFormGetAuthorizerInfoResult;
 import com.entgroup.wxplatform.entoperation.domain.User;
@@ -108,8 +120,23 @@ public class WechatPlatformController {
 		model.addAttribute("authorizeInfo", JSON.toJSONString(authorizeInfo));
 		return "callback";
 	}
-
-
+	
+	@RequestMapping("/myapp")
+	public String myApp(Model model){
+		UserDetails userDetails = (UserDetails) SecurityContextHolder
+				.getContext().getAuthentication().getPrincipal();
+		User user = usersvr.findByUsername(userDetails.getUsername());
+		model.addAttribute("user", user);
+		return "myapp";
+	}
+	@RequestMapping("/sendAllIndex")
+	public String sendAllIndex(Model model){
+		UserDetails userDetails = (UserDetails) SecurityContextHolder
+				.getContext().getAuthentication().getPrincipal();
+		User user = usersvr.findByUsername(userDetails.getUsername());
+		model.addAttribute("user", user);
+		return "sendAllIndex";
+	}
 	/**
 	 * 群发文本消息
 	 * 
@@ -119,29 +146,92 @@ public class WechatPlatformController {
 	 * @return
 	 * @throws WxErrorException
 	 */
-	@RequestMapping("/sendAll")
-	public String sendAll(String authToken, String msg, Model model)
+	@RequestMapping(value="/sendAll",method=RequestMethod.POST)
+	public String sendAll(String appid, String msg, Model model)
 			throws WxErrorException {
-		WxMpInMemoryConfigStorage config = new WxMpInMemoryConfigStorage();
-		if (!StringUtils.isEmpty(authToken)) {
-			config.updateAccessToken(authToken, 7200);
-			wxMpService.setWxMpConfigStorage(config);
-			WxMpMassGroupMessage gmsg = new WxMpMassGroupMessage();
-			gmsg.setMsgtype(WxConsts.MASS_MSG_TEXT);
-			gmsg.setContent(msg);
+		beforeSend(appid, msg, model);
+		WxMpMassGroupMessage gmsg = new WxMpMassGroupMessage();
+		gmsg.setMsgtype(WxConsts.MASS_MSG_TEXT);
+		gmsg.setContent(msg);
+		try{
 			WxMpMassSendResult result = wxMpService.massGroupMessageSend(gmsg);
 			model.addAttribute("stat", result);
+		}catch(WxErrorException e){
+			model.addAttribute("error", e.getError().toString());
 		}
-		return "status";
-	}
-	@RequestMapping("/myapp")
-	public String myApp(Model model){
+		
 		UserDetails userDetails = (UserDetails) SecurityContextHolder
 				.getContext().getAuthentication().getPrincipal();
 		User user = usersvr.findByUsername(userDetails.getUsername());
 		model.addAttribute("user", user);
-		return "myapp";
+		
+		return "sendAllIndex";
 	}
+
+	protected void beforeSend(String appid, String msg, Model model) {
+		if(StringUtils.isEmpty(appid)||StringUtils.isEmpty(msg))
+			model.addAttribute("error", "选择一个公众号且信息不能为空!");
+		WxMpAPP app =  mpsvr.findByAppId(appid);
+		if(app.isExpriesIn()){
+			PlatFormGetAuthAccessResult token = PlatFormManager.getAuthAccessToken(app.getAppId(),app.getRefreshToken());
+			app.setAccessToken(token.getAuthorizerAccessToken());
+			app.setExpriesIn(System.currentTimeMillis()
+					+ (token.getExpiresIn() - 200) * 1000l);
+			app.setRefreshToken(token.getAuthorizerRefreshToken());
+			mpsvr.saveBean(app);
+		}
+		if (app!=null&&!StringUtils.isEmpty(msg)) {
+			WxMpInMemoryConfigStorage config = new WxMpInMemoryConfigStorage();
+			config.updateAccessToken(app.getAccessToken(), app.getExpriesIn());
+			wxMpService.setWxMpConfigStorage(config);
+		}else{
+			model.addAttribute("error", "公众号不存在!");
+		}
+	}
+	@RequestMapping(value="/sendAllImg",method=RequestMethod.POST)
+	public String sendAllImg(Model model,String msgContent,String appid) throws WxErrorException{
+		beforeSend(appid, msgContent, model);
+		
+		 // 单图文消息
+	    WxMpMaterialNews wxMpMaterialNewsSingle = new WxMpMaterialNews();
+	    WxMpMaterialNews.WxMpMaterialNewsArticle mpMaterialNewsArticleSingle = new WxMpMaterialNews.WxMpMaterialNewsArticle();
+	    mpMaterialNewsArticleSingle.setAuthor("author");
+	    mpMaterialNewsArticleSingle.setThumbMediaId("");
+	    mpMaterialNewsArticleSingle.setTitle("single title");
+	    mpMaterialNewsArticleSingle.setContent(msgContent);
+	    mpMaterialNewsArticleSingle.setContentSourceUrl("content url");
+	    mpMaterialNewsArticleSingle.setShowCoverPic(true);
+	    mpMaterialNewsArticleSingle.setDigest("single news");
+	    wxMpMaterialNewsSingle.addArticle(mpMaterialNewsArticleSingle);
+	    WxMpMaterialUploadResult resSingle = wxMpService.materialNewsUpload(wxMpMaterialNewsSingle);
+	    WxMpMassGroupMessage gmsg = new WxMpMassGroupMessage();
+		gmsg.setMsgtype(WxConsts.MASS_MSG_NEWS);
+		gmsg.setMediaId(resSingle.getMediaId());
+		try{
+			WxMpMassSendResult result = wxMpService.massGroupMessageSend(gmsg);
+			model.addAttribute("stat", result);
+		}catch(WxErrorException e){
+			model.addAttribute("error", e.getError().toString());
+		}
+		
+	    return "sendAllIndex";
+	}
+
+	@RequestMapping(value = "/upload")
+	@ResponseBody
+	public String upload(MultipartFile file) throws IOException, WxErrorException {
+		if (!file.isEmpty()) { 
+			String name = file.getOriginalFilename();
+			String fileType = name.substring(name.lastIndexOf('.'));
+			File tempFile = FileUtils.createTmpFile(file.getInputStream(), UUID.randomUUID().toString(),
+					fileType);
+			
+			 String rest = wxMpService.imageUpload(tempFile);
+			return rest;
+		}
+		return null;
+	}
+	public 
 	@Autowired
 	MessageHandler messageHandler;
 	/**

@@ -8,33 +8,20 @@
 
 	<div class="container" id="page-wrapper" layout:fragment="content">
 		<div class="container-fluid">
-			<form th:action="@{/sendAll}" method="post">
-				<div>
-					<p class="bg-info">获取到的（刷新）授权公众号的接口调用凭据（令牌）</p>
-					<textarea class="form-control" rows="8" name="authInfo"
-						th:text="${authInfo}"></textarea>
-				</div>
-				<div>
-					<p class="bg-info">获取授权方的公众号帐号基本信息</p>
-					<textarea class="form-control" rows="8" name="authorizeInfo"
-						th:text="${authorizeInfo}"></textarea>
-				</div>
-				<div>
-					<p class="bg-info">群发消息</p>
+			<div class="row">
+				<div class="col-lg-12">
 					<div>
-						<p>
-							<label>access_token:</label> <span th:text="${authToken}"></span>
-						</p>
-						<input type="hidden" class="form-control" name="authToken"
-							value="" th:value="${authToken}" /> 
-						<input type="text" name="msg" class="form-control" />
-						
-						<button type="submit" class="btn btn-primary">发送</button>
+						<p class="bg-info">获取到的（刷新）授权公众号的接口调用凭据（令牌）</p>
+						<textarea class="form-control" rows="8" name="authInfo"
+							th:text="${authInfo}"></textarea>
+					</div>
+					<div>
+						<p class="bg-info">获取授权方的公众号帐号基本信息</p>
+						<textarea class="form-control" rows="8" name="authorizeInfo"
+							th:text="${authorizeInfo}"></textarea>
 					</div>
 				</div>
-				<div th:text="${stat}">
-				</div>
-			</form>
+			</div>
 		</div>
 	</div>
 </body>

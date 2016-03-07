@@ -1,15 +1,20 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" layout:decorator="layout/default">
+<html xmlns:th="http://www.thymeleaf.org"
+	layout:decorator="layout/default">
 <head>
 <title>auth Demo</title>
 </head>
 <body>
-	<div class="container" id="page-wrapper" layout:fragment="content">
+	<div id="page-wrapper" layout:fragment="content">
 		<div class="container-fluid">
-			<div>
-				<span th:text="${url}"></span>
-				<h1>微信授权登录</h1>
-				<a th:href="${url}"><img src="./images/icon_button3_1.png" /></a>
+			<div class="row">
+				<div>
+					<h1>微信授权登录</h1>
+					<a th:href="${url}"><img src="./images/icon_button3_1.png" /></a>
+					<p>
+						<samp th:text="${url}" style="word-wrap: break-word"></samp>
+					</p>
+				</div>
 			</div>
 		</div>
 	</div>
