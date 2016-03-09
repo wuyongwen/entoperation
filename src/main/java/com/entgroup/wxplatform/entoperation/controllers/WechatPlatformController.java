@@ -171,6 +171,7 @@ public class WechatPlatformController {
 	protected void beforeSend(String appid, String msg, Model model) {
 		if(StringUtils.isEmpty(appid)||StringUtils.isEmpty(msg))
 			model.addAttribute("error", "选择一个公众号且信息不能为空!");
+		initTokenConfig(appid);
 		WxMpAPP app =  mpsvr.findByAppId(appid);
 		if(app.isExpriesIn()){
 			PlatFormGetAuthAccessResult token = PlatFormManager.getAuthAccessToken(app.getAppId(),app.getRefreshToken());
@@ -180,7 +181,7 @@ public class WechatPlatformController {
 			app.setRefreshToken(token.getAuthorizerRefreshToken());
 			mpsvr.saveBean(app);
 		}
-		if (app!=null&&!StringUtils.isEmpty(msg)) {
+		if (app!=null) {
 			WxMpInMemoryConfigStorage config = new WxMpInMemoryConfigStorage();
 			config.updateAccessToken(app.getAccessToken(), app.getExpriesIn());
 			wxMpService.setWxMpConfigStorage(config);
@@ -188,15 +189,32 @@ public class WechatPlatformController {
 			model.addAttribute("error", "公众号不存在!");
 		}
 	}
+	private void initTokenConfig(String appid) {
+		WxMpAPP app =  mpsvr.findByAppId(appid);
+		if(app.isExpriesIn()){
+			PlatFormGetAuthAccessResult token = PlatFormManager.getAuthAccessToken(app.getAppId(),app.getRefreshToken());
+			app.setAccessToken(token.getAuthorizerAccessToken());
+			app.setExpriesIn(System.currentTimeMillis()
+					+ (token.getExpiresIn() - 200) * 1000l);
+			app.setRefreshToken(token.getAuthorizerRefreshToken());
+			mpsvr.saveBean(app);
+		}
+		if (app!=null) {
+			WxMpInMemoryConfigStorage config = new WxMpInMemoryConfigStorage();
+			config.updateAccessToken(app.getAccessToken(), app.getExpriesIn());
+			wxMpService.setWxMpConfigStorage(config);
+		}		
+	}
+
 	@RequestMapping(value="/sendAllImg",method=RequestMethod.POST)
-	public String sendAllImg(Model model,String msgContent,String appid) throws WxErrorException{
+	public String sendAllImg(Model model,String msgContent,String appid,String mediaId) throws WxErrorException{
 		beforeSend(appid, msgContent, model);
 		
 		 // 单图文消息
 	    WxMpMaterialNews wxMpMaterialNewsSingle = new WxMpMaterialNews();
 	    WxMpMaterialNews.WxMpMaterialNewsArticle mpMaterialNewsArticleSingle = new WxMpMaterialNews.WxMpMaterialNewsArticle();
 	    mpMaterialNewsArticleSingle.setAuthor("author");
-	    mpMaterialNewsArticleSingle.setThumbMediaId("");
+	    mpMaterialNewsArticleSingle.setThumbMediaId(mediaId);
 	    mpMaterialNewsArticleSingle.setTitle("single title");
 	    mpMaterialNewsArticleSingle.setContent(msgContent);
 	    mpMaterialNewsArticleSingle.setContentSourceUrl("content url");
@@ -213,13 +231,18 @@ public class WechatPlatformController {
 		}catch(WxErrorException e){
 			model.addAttribute("error", e.getError().toString());
 		}
+		UserDetails userDetails = (UserDetails) SecurityContextHolder
+				.getContext().getAuthentication().getPrincipal();
+		User user = usersvr.findByUsername(userDetails.getUsername());
+		model.addAttribute("user", user);
 		
 	    return "sendAllIndex";
 	}
 
 	@RequestMapping(value = "/upload")
 	@ResponseBody
-	public String upload(MultipartFile file) throws IOException, WxErrorException {
+	public String upload(MultipartFile file,Model model,String appId) throws IOException, WxErrorException {
+		initTokenConfig("wx34dcba427f62a33e");
 		if (!file.isEmpty()) { 
 			String name = file.getOriginalFilename();
 			String fileType = name.substring(name.lastIndexOf('.'));
@@ -231,7 +254,24 @@ public class WechatPlatformController {
 		}
 		return null;
 	}
-	public 
+	@RequestMapping(value = "/uploadMaterial")
+	@ResponseBody
+	public WxMpMaterialUploadResult uploadMaterial(MultipartFile file,String appId) throws IOException, WxErrorException {
+		initTokenConfig("wx34dcba427f62a33e");
+		if (!file.isEmpty()) { 
+			String name = file.getOriginalFilename();
+			String fileType = name.substring(name.lastIndexOf('.'));
+			File tempFile = FileUtils.createTmpFile(file.getInputStream(), UUID.randomUUID().toString(),
+					fileType);
+			WxMpMaterial wxMaterial = new WxMpMaterial();
+		    wxMaterial.setFile(tempFile);
+		    wxMaterial.setName(name);
+		    WxMpMaterialUploadResult res = wxMpService.materialFileUpload(WxConsts.MEDIA_IMAGE, wxMaterial);
+		    
+			return res;
+		}
+		return null;
+	}
 	@Autowired
 	MessageHandler messageHandler;
 	/**
@@ -271,7 +311,7 @@ public class WechatPlatformController {
 		// if (!StringUtils.isEmpty(appId))
 		// context.addAttribute("AppId", appId);
 		OutputStream os = resp.getOutputStream();
-		log.info("请求参数：" + context.toString());
+		log.info("请求参数：" +appId+" : "+ context.toString());
 		try {
 			String responseString = messageHandler.process(context);
 			os.write(StringUtils.getBytesUtf8(responseString));
