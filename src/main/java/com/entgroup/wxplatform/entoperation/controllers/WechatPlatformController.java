@@ -41,6 +41,7 @@ import com.chn.common.StringUtils;
 import com.chn.wx.MessageHandler;
 import com.chn.wx.api.PlatFormManager;
 import com.chn.wx.dto.Context;
+import com.chn.wx.store.PlatformConfigYamlStorage;
 import com.chn.wx.vo.result.PlatFormAccessTokenResult;
 import com.chn.wx.vo.result.PlatFormGetAuthAccessResult;
 import com.chn.wx.vo.result.PlatFormGetAuthInfoResult;
@@ -77,7 +78,9 @@ public class WechatPlatformController {
 	@RequestMapping("/auth")
 	public String auth(Model model) {
 		String url = PlatFormManager.getLoginUrl();
+		String ticket = new PlatformConfigYamlStorage().getTicket();
 		model.addAttribute("url", url);
+		model.addAttribute("ticket",ticket);
 		return "auth";
 	}
 
@@ -101,6 +104,7 @@ public class WechatPlatformController {
 		PlatFormGetAuthorizerInfoResult authorizeInfo = PlatFormManager
 				.getAuthorizerInfo(authInfoResult.getAuthorizationInfo()
 						.getAuthorizerAppId());
+		
 		if (mpsvr.findByAppId(authInfoResult.getAuthorizationInfo()
 				.getAuthorizerAppId()) == null) {
 			WxMpAPP app = new WxMpAPP();
@@ -110,6 +114,14 @@ public class WechatPlatformController {
 			WxMpAPPInfo info = new WxMpAPPInfo();
 			info.setAuthorizerInfor(authorizeInfo);
 			app.setInfoDetial(info);
+			mpsvr.saveBean(app);
+		}else{
+			WxMpAPP app = mpsvr.findByAppId(authInfoResult.getAuthorizationInfo()
+					.getAuthorizerAppId());
+			app.setAuthorizationInfo(authInfoResult.getAuthorizationInfo());
+			app.getInfoDetial().setAuthorizerInfor(authorizeInfo);
+			User user = usersvr.findByUsername(userDetails.getUsername());
+			app.setUser(user);
 			mpsvr.saveBean(app);
 		}
 

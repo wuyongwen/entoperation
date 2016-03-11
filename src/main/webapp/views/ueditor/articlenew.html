@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	layout:decorator="layout/default">
+<head lang="en">
+<title>我的公众号</title>
+<link rel="stylesheet" type="text/css" media="screen"
+	href="../../resources/bootstrap-fileinput/fileinput.css"
+	th:href="@{/resources/bootstrap-fileinput/fileinput.css}" />
+<link rel="stylesheet" type="text/css" media="screen"
+	href="../../css/edit.css" th:href="@{/css/edit.css}" />
+</head>
+<body>
+	<div id="page-wrapper" layout:fragment="content">
+		<div class="container-fluid">
+			<div class="row editor_main">
+				<div class="js_main_title main_hd">
+					<div class="page_nav">
+						<span class="gap">新建图文消息</span>
+					</div>
+				</div>
+				<div class="appmsg_edit_box">
+					<div class="edit_left">
+						<div class="left_container">
+							<div class="appmsg_container_hd">
+								<span class="appmsg_container_title">图文列表</span>
+								<div class="appmsg multi editing">
+									<div class="">
+										<div id="js_appmsg_preview" class="appmsg_content">
+											<div id="appmsgItem0"
+												class="js_appmsg_item appmsg_item_wrp has_thumb">
+												<div class="first_appmsg_item" title="第一篇图文">
+													<div class="cover_appmsg_item">
+														<h4 class="appmsg_title">
+															<a class="js_appmsg_title" href="javascript:void(0);"
+																onclick="return false;">阿斯蒂芬</a>
+														</h4>
+														<div class="appmsg_thumb_wrp js_appmsg_thumb"
+															style="background-image: url('https://mmbiz.qlogo.cn/mmbiz/ZEWGp4atECTjSnwZyX2oD0uhAqjbV4MKpcdic900NK9GlicCIzQptv5fiaQ1WDpZzyW91xHvoMiaCoT4KYmGkUuWfg/0?wx_fmt=jpeg');">
+															<!--<img class="js_appmsg_thumb appmsg_thumb" src="https://mmbiz.qlogo.cn/mmbiz/ZEWGp4atECTjSnwZyX2oD0uhAqjbV4MKpcdic900NK9GlicCIzQptv5fiaQ1WDpZzyW91xHvoMiaCoT4KYmGkUuWfg/0?wx_fmt=jpeg">-->
+															<div class="appmsg_thumb default">
+																<i class="icon_appmsg_thumb">封面图片</i>
+															</div>
+														</div>
+													</div>
+													<div class="appmsg_edit_mask">
+														<a onclick="return false;"
+															class="icon20_common sort_down_white js_down" data-id="0"
+															href="javascript:;" title="下移" style="display: block;">向下</a>
+													</div>
+												</div>
+												<div class="appmsg_item" style="display: none;"
+													title="第一篇图文">
+													<div class="appmsg_thumb_wrp js_appmsg_thumb"
+														style="background-image: url('https://mmbiz.qlogo.cn/mmbiz/ZEWGp4atECTjSnwZyX2oD0uhAqjbV4MKpcdic900NK9GlicCIzQptv5fiaQ1WDpZzyW91xHvoMiaCoT4KYmGkUuWfg/0?wx_fmt=jpeg');">
+														<div class="appmsg_thumb default">
+															<i class="icon_appmsg_thumb_small">缩略图</i>
+														</div>
+													</div>
+													<h4 class="appmsg_title js_appmsg_title">阿斯蒂芬</h4>
+													<div class="appmsg_edit_mask">
+														<a onclick="return false;"
+															class="icon20_common sort_up_white   js_up" data-id="0"
+															href="javascript:;" title="上移">向上</a> <a
+															onclick="return false;"
+															class="icon20_common sort_down_white js_down" data-id="0"
+															href="javascript:;" title="下移" style="display: block;">向下</a>
+														<a onclick="return false;"
+															class="icon20_common del_media_white js_del" data-id="0"
+															href="javascript:;" title="删除">删除</a>
+													</div>
+												</div>
+											</div>
+										</div>
+										<a onclick="return false;" title="添加一篇图文"
+											class="create_access_primary appmsg_add" id="js_add_appmsg"
+											href="javascript:void(0);"> <i
+											class="icon35_common add_gray">增加一条</i>
+										</a>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div></div>
+					</div>
+					<div class="edit_right">
+						<div class="appmsg_editor_wrp">
+							<form class="form-horizontal edit_form">
+								<div class="form-group">
+									<label for="title" class="col-sm-2 control-label">标题:</label>
+									<div class="col-sm-10">
+										<input type="text" class="form-control" id="title"
+											name="title" placeholder="标题"></input>
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="inputEmail3" class="col-sm-2 control-label">封面:</label>
+									<div class="col-sm-10">
+										<input id="file-3" type="file" class="file" name="file"
+											data-upload-url="/uploadMaterial"></input> <input
+											type="hidden" name="mediaId" id="mediaId" value="" /> <small>（大图片建议尺寸：900像素*500像素
+											格式：png、gif、jpg）</small>
+										<div id="errorBlock" class="help-block"></div>
+										<div id="imagediv"></div>
+									</div>
+								</div>
+
+								<div class="form-group">
+									<label for="inputEmail3" class="col-sm-2 control-label">正文</label>
+									<div class="col-sm-10">
+										<!-- 加载编辑器的容器 -->
+										<script id="container" name="content" type="text/plain">
+    									</script>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+				<div class="editor_bottom">
+					<div>
+						<div>
+							<button type="submit" onsubmit="return false;" id="sync"
+								class="btn btn-success">同步到公众号</button>
+							<button type="submit" onsubmit="return false;" id="send"
+								class="btn btn-success">群发</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="modal-content" layout:fragment="modal_1">
+		<div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal"
+				aria-label="Close">
+				<span aria-hidden="true">&times;</span>
+			</button>
+			<h4 class="modal-title">选择公众号</h4>
+		</div>
+		<div class="modal-body">
+			<div class="row">
+				<div class="col-sm-2">
+					<span>公共号:</span>
+				</div>
+				<div class="col-sm-10 checkbox"
+					th:if="${not #lists.isEmpty(user.appsSet)}">
+					<th:block th:each="app: ${user.appsSet}">
+						<label class="checkbox-inline"> <input type="checkbox"
+							name="appid" value="" id="appid" th:value="${app.appId}" /> <span
+							th:text="${app.infoDetial.nickName}"></span>
+						</label>
+					</th:block>
+				</div>
+			</div>
+		</div>
+		<div class="modal-footer">
+			<button type="button" class="btn btn-success" data-dismiss="modal">关闭</button>
+			<button type="button" class="btn btn-success">同步</button>
+		</div>
+	</div>
+	<div class="modal-content" layout:fragment="modal_2">
+		<div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal"
+				aria-label="Close">
+				<span aria-hidden="true">&times;</span>
+			</button>
+			<h4 class="modal-title">选择公众号</h4>
+		</div>
+		<div class="modal-body">
+			<div class="row">
+				<div class="col-sm-2">
+					<span>公共号:</span>
+				</div>
+				<div class="col-sm-10 checkbox"
+					th:if="${not #lists.isEmpty(user.appsSet)}">
+					<th:block th:each="app: ${user.appsSet}">
+						<label class="checkbox-inline"> <input type="checkbox"
+							name="appid" value="" id="appid" th:value="${app.appId}" /> <span
+							th:text="${app.infoDetial.nickName}"></span>
+						</label>
+					</th:block>
+				</div>
+			</div>
+
+		</div>
+		<div class="modal-footer">
+			<button type="button" class="btn btn-success" data-dismiss="modal">关闭</button>
+			<button type="button" class="btn btn-success">群发</button>
+			<button type="button" class="btn btn-success">定时群发</button>
+		</div>
+	</div>
+</body>
+</html>
+<script>
+	//window.UEDITOR_HOME_URL = "/ueditor/";
+</script>
+<script src="../../resources/bootstrap-fileinput/fileinput.js"
+	type="text/javascript"></script>
+<script src="../../resources/bootstrap-fileinput/fileinput_locale_zh.js"
+	type="text/javascript"></script>
+<!-- 配置文件 -->
+<script type="text/javascript" src="ueditor.config.js"
+	th:src="@{/resources/ueditor/ueditor.config.js}"></script>
+<!-- 编辑器源码文件 -->
+<script type="text/javascript" src="ueditor.all.js"
+	th:src="@{/resources/ueditor/ueditor.all.js}"></script>
+<!-- 实例化编辑器 -->
+<script type="text/javascript">
+<!-- 修改上传服务器路径 -->
+	/*<![CDATA[*/
+	UE.Editor.prototype._bkGetActionUrl = UE.Editor.prototype.getActionUrl;
+	UE.Editor.prototype.getActionUrl = function(action) {
+		if (action == 'uploadimage' || action == 'uploadscrawl'
+				|| action == 'uploadimage') {
+			return 'upload';
+			//} else if (action == 'uploadvideo') {
+			//return 'http://a.b.com/video.php';
+		} else {
+			return this._bkGetActionUrl.call(this, action);
+		}
+	}
+	var ue = UE.getEditor('container', {
+		serverUrl : "ueditorController.do"
+	});
+	$(function() {
+
+		$("#file-3").fileinput({
+			uploadExtraData : {
+				appId : 'image'
+			},
+			showPreview : false,
+			allowedFileExtensions : [ 'jpg', 'png', 'gif' ],
+			elErrorContainer : '#errorBlock'
+		});
+		$("#file-3").on('fileuploaded',
+						function(event, data, previewId, index) {
+							var form = data.form, files = data.files, extra = data.extra, response = data.response, reader = data.reader;
+							console.log(data);
+							$("#mediaId").val(response.mediaId);
+
+							var img = $("<img src=''/>");
+							img.attr("src", response.url);
+							$("#imagediv").empty().append(img).append(
+									$("<a href='javascript:void()'>删除</a>")
+											.click(function() {
+												$("#imagediv").empty();
+												$("#medialId").val("");
+											}));
+						});
+		$("#sync").click(function() {
+			$('#modal_1').modal('show');
+			return false;
+		});
+		$("#send").click(function() {
+			$('#modal_2').modal('show');
+			return false;
+		});
+	})
+	/*]]>*/
+</script>

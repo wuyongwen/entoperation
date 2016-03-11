@@ -1,0 +1,90 @@
+@CHARSET "utf8";
+
+.editor_main {
+	margin: 10px 0 10px 0;
+	border: 1px solid #d9dadc;
+	background-color: #fff;
+}
+
+.main_hd {
+	line-height: 40px;
+}
+
+.main_hd .page_nav {
+	margin: 0;
+	padding: 6px 20px;
+	border-bottom: 1px solid #e7e7eb;
+}
+.appmsg_edit_box{
+	position: relative;
+	height: 100%;
+}
+.edit_left {
+	position: absolute;
+	left: 0;
+	height: 100%;
+}
+.edit_left .left_container{
+	width: 250px;
+    border-right: 1px solid #e7e7eb;
+    background-color: #f8f8f8;
+    height: 100%;
+    margin-top: 0px;
+}
+.edit_left .left_container .appmsg_container_hd{
+	padding:10px;
+}
+.appmsg {
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 20px;
+    border: 1px solid #e7e7eb;
+    background-color: #fff;
+    color: #666;
+}
+.appmsg_container_hd .appmsg_add {
+    margin: 0;
+    border-top-width: 0;
+    line-height: 90px;
+}
+.icon35_common.add_gray {
+    background: url("/images/base.png") 0 -2915px no-repeat;
+}
+.create_access_primary i {
+    cursor: pointer;
+    line-height: 300px;
+    overflow: hidden;
+}
+.icon35_common {
+    width: 35px;
+    height: 35px;
+    vertical-align: middle;
+    display: inline-block;
+}
+.create_access_primary {
+    display: block;
+    border: 2px dotted #d9dadc;
+    line-height: 60px;
+    font-size: 0;
+    text-align: center;
+    margin-bottom: 20px;
+}
+.appmsg .appmsg_content {
+    border-bottom-width: 1px;
+}
+.edit_right {
+	margin: 0 10px 0 251px;
+    position: relative;
+}
+.edit_right .appmsg_editor_wrp{
+	height: 100%;
+	padding:10px 0px;
+}
+.edit_right .appmsg_editor_wrp .edit_form{
+}
+
+.editor_bottom{
+	padding: 15px;
+    border-top: 1px solid #C1C9CA;
+    text-align: center;
+}

@@ -27,15 +27,18 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
 	@Override
 	protected void configure(HttpSecurity httpSecurity) throws Exception {
-		httpSecurity.authorizeRequests().antMatchers("/").permitAll().and().authorizeRequests()
-				.antMatchers("/console/**").permitAll().and().authorizeRequests().antMatchers("/wx/**").permitAll();
+		httpSecurity.authorizeRequests()
+					.antMatchers("/console/**").permitAll()
+					.antMatchers("/wx/**").permitAll()
+					.antMatchers("/upload/**").permitAll();
+		
 
 		httpSecurity.csrf().disable();
 		httpSecurity.headers().frameOptions().disable();
 
 		// static resources
-		httpSecurity.authorizeRequests().antMatchers("/css/**", "/js/**", "/images/**", "/resources/**", "/webjars/**")
-				.permitAll();
+		httpSecurity.authorizeRequests().antMatchers("/css/**", "/js/**", "/images/**", "/resources/**", "/webjars/**").permitAll()
+		.regexMatchers(".*\\.(css|js)").permitAll();
 
 		httpSecurity.authorizeRequests().antMatchers("/signin").anonymous().anyRequest().authenticated().and()
 				.formLogin().loginPage("/signin").loginProcessingUrl("/sign-in-process.html")
@@ -46,6 +49,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 		httpSecurity.sessionManagement().invalidSessionUrl("/signin");
 	}
 
+
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
 
@@ -54,6 +58,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 		// In case of password encryption - for production site
 		// auth.userDetailsService(customerUserDetailsService).passwordEncoder(passwordEncoder());
 	}
+
+
 
 	@Bean
 	public FilterRegistrationBean getSpringSecurityFilterChainBindedToError(

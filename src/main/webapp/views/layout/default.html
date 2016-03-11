@@ -1,22 +1,31 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-  <!-- <title>Spring Boot and Thymeleaf - Thymeleaf Layout Dialect</title>
-  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js" th:src="@{/webjars/jquery/2.1.4/jquery.min.js}" th:unless="isTemplate"></script>
-  <script src="http://cdn.jsdelivr.net/webjars/bootstrap/3.3.4/js/bootstrap.min.js" th:src="@{/webjars/bootstrap/3.3.4/js/bootstrap.min.js}" th:unless="isTemplate"></script>
-  <script src="../../js/sb-admin-2.js" th:src="@{/js/sb-admin-2.js}" th:unless="isTemplate"></script>
-  <script src="../../resources/metisMenu/dist/metisMenu.min.js"  th:src="@{/resources/metisMenu/dist/metisMenu.min.js}" th:unless="isTemplate"></script>
-  <link rel="stylesheet" type="text/css" media="screen" href="../../css/common.css" th:href="@{/css/common.css}" th:unless="isTemplate" />
-  <link rel="stylesheet" type="text/css" media="screen" href="../../css/sb-admin-2.css" th:href="@{/css/sb-admin-2.css}" th:unless="isTemplate" />
-  <link rel="stylesheet" type="text/css" media="screen" href="http://cdn.jsdelivr.net/webjars/bootstrap/3.3.4/css/bootstrap.min.css" th:href="@{/webjars/bootstrap/3.3.4/css/bootstrap.min.css}" th:unless="isTemplate" />
-  <link rel="stylesheet" type="text/css" media="screen" href="../../resources/metisMenu/dist/metisMenu.css" th:href="@{/resources/metisMenu/dist/metisMenu.min.css}" th:unless="isTemplate" />
-  <link rel="stylesheet" type="text/css" media="screen" href="../../resources/font-awesome/css/font-awesome.min.css" th:href="@{/resources/font-awesome/css/font-awesome.min.css}" th:unless="isTemplate" /> -->
-  <!--/*/ <th:block th:include="fragments/headerinc :: head"></th:block> /*/-->
+    <!--/*/ <th:block th:include="fragments/headerinc :: head"></th:block> /*/-->
 </head>
 <body>
+<!-- modal 1 -->
+<div class="modal fade" id="modal_1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog">
+    <div class="modal-content" layout:fragment="modal_1">
+    </div>
+  </div>
+</div>
+<!-- modal 2 -->
+<div class="modal fade" id="modal_2" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog">
+    <div class="modal-content" layout:fragment="modal_2">
+    </div>
+  </div>
+</div>
+<!-- error modal -->
+<div class="modal fade" id="errorModal" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog">
+    <div class="modal-content" layout:fragment="errorModal">
+    </div>
+  </div>
+</div>
 <div id="wrapper">
-
     <!-- Navigation -->
     <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
       <div th:replace="fragments/header :: div">
@@ -43,7 +52,6 @@
         <!-- /.sidebar-collapse -->
       </div>
       <!-- /.navbar-static-side -->
-      
     </nav>
 
     <!-- Page Content -->
@@ -60,7 +68,6 @@
       <!-- /.container-fluid -->
     </div>
     <!-- /#page-wrapper -->
-
 </div>
 <!-- /#wrapper -->
 </body>

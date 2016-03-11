@@ -18,6 +18,8 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
+import com.entgroup.wxplatform.entoperation.controllers.UeditorServlet;
+
 @Configuration
 public class WebConfiguration extends WebMvcConfigurerAdapter{
 
@@ -25,6 +27,12 @@ public class WebConfiguration extends WebMvcConfigurerAdapter{
     ServletRegistrationBean h2servletRegistration(){
         ServletRegistrationBean registrationBean = new ServletRegistrationBean(new WebServlet());
         registrationBean.addUrlMappings("/console/*");
+        return registrationBean;
+    }
+    @Bean
+    ServletRegistrationBean UeservletRegistration(){
+        ServletRegistrationBean registrationBean = new ServletRegistrationBean(new UeditorServlet());
+        registrationBean.addUrlMappings("/ueditor/ueditorController.do");
         return registrationBean;
     }
     @Bean
@@ -39,19 +47,20 @@ public class WebConfiguration extends WebMvcConfigurerAdapter{
 	public void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer) {
 		configurer.enable();
 	}
-    @Bean  
+  /*  @Bean  
     public MultipartConfigElement multipartConfigElement() {  
         MultipartConfigFactory factory = new MultipartConfigFactory();  
         factory.setMaxFileSize("128KB");  
         factory.setMaxRequestSize("128KB");
         return factory.createMultipartConfig();  
-    }  
+    }  */
 	@Override
 	public void addResourceHandlers(ResourceHandlerRegistry registry) {
 		registry.addResourceHandler("/resources/**").addResourceLocations("/resources/");
 		registry.addResourceHandler("/css/**").addResourceLocations("/css/");
 		registry.addResourceHandler("/js/**").addResourceLocations("/js/");
 		registry.addResourceHandler("/images/**").addResourceLocations("/images/");
+		registry.addResourceHandler("/upload/**").addResourceLocations("/views/upload/");
 		registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
 	}
 	

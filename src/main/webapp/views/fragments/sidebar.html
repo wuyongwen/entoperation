@@ -16,7 +16,13 @@
       <li></li>
       <li><a href="/auth" th:href="${'/auth'}"><i class="fa fa-fw"></i> 公众号授权</a></li>
       <li><a href="/myapp" th:href="${'/myapp'}"><i class="fa fa-fw"></i> 我的公众号</a></li>
-      <li><a href="/sendAllIndex" th:href="${'/sendAllIndex'}"><i class="fa fa-fw"></i> 群发消息</a></li>
+      <li>
+      	<a href="#"><i class="fa fa-bar-chart-o fa-fw"></i>资源管理<span class="fa arrow"></span></a>
+      	<ul class="nav nav-second-level">
+      		<li><a href="/sendAllIndex" th:href="${'/sendAllIndex'}"><i class="fa fa-fw"></i> 群发消息</a></li>
+      		<li><a href="/ueditor/new" th:href="${'/ueditor/new'}"><i class="fa fa-fw"></i>编辑器</a></li>
+      	</ul>
+      </li>
       <!--   <li>
         <a href="#"><i class="fa fa-wrench fa-fw"></i> UI Elements<span class="fa arrow"></span></a>
         <ul class="nav nav-second-level">
