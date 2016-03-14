@@ -84,7 +84,7 @@
 					</div>
 					<div class="edit_right">
 						<div class="appmsg_editor_wrp">
-							<form class="form-horizontal edit_form">
+							<form class="form-horizontal edit_form" id="editForm">
 								<div class="form-group">
 									<label for="title" class="col-sm-2 control-label">标题:</label>
 									<div class="col-sm-10">
@@ -96,8 +96,8 @@
 									<label for="inputEmail3" class="col-sm-2 control-label">封面:</label>
 									<div class="col-sm-10">
 										<input id="file-3" type="file" class="file" name="file"
-											data-upload-url="/uploadMaterial"></input> <input
-											type="hidden" name="mediaId" id="mediaId" value="" /> <small>（大图片建议尺寸：900像素*500像素
+											data-upload-url="uploadMaterial"></input> <input
+											type="hidden" name="thumbMediaId" id="thumbMediaId" value="" /> <small>（大图片建议尺寸：900像素*500像素
 											格式：png、gif、jpg）</small>
 										<div id="errorBlock" class="help-block"></div>
 										<div id="imagediv"></div>
@@ -146,7 +146,7 @@
 					th:if="${not #lists.isEmpty(user.appsSet)}">
 					<th:block th:each="app: ${user.appsSet}">
 						<label class="checkbox-inline"> <input type="checkbox"
-							name="appid" value="" id="appid" th:value="${app.appId}" /> <span
+							name="synappid" value="" id="appid" th:value="${app.appId}" /> <span
 							th:text="${app.infoDetial.nickName}"></span>
 						</label>
 					</th:block>
@@ -155,7 +155,7 @@
 		</div>
 		<div class="modal-footer">
 			<button type="button" class="btn btn-success" data-dismiss="modal">关闭</button>
-			<button type="button" class="btn btn-success">同步</button>
+			<button type="button" id="synbtn" class="btn btn-success">同步</button>
 		</div>
 	</div>
 	<div class="modal-content" layout:fragment="modal_2">
@@ -236,16 +236,15 @@
 						function(event, data, previewId, index) {
 							var form = data.form, files = data.files, extra = data.extra, response = data.response, reader = data.reader;
 							console.log(data);
-							$("#mediaId").val(response.mediaId);
+							$("#thumbMediaId").val(response.url);
 
 							var img = $("<img src=''/>");
 							img.attr("src", response.url);
 							$("#imagediv").empty().append(img).append(
-									$("<a href='javascript:void()'>删除</a>")
-											.click(function() {
+									$("<a href='javascript:void()'>删除</a>").click(function() {
 												$("#imagediv").empty();
-												$("#medialId").val("");
-											}));
+												$("#thumbMediaId").val("");
+							}));
 						});
 		$("#sync").click(function() {
 			$('#modal_1').modal('show');
@@ -255,6 +254,37 @@
 			$('#modal_2').modal('show');
 			return false;
 		});
+		
+		$("#synbtn").click(function(){
+			var appId = checkForm('synappid');
+			postFrom(function(){
+				var formData = {};
+				var map = $('#editForm').serializeArray();
+			    $.each(map, function() {
+			    	formData[this.name] = this.value;
+			    });
+			    formData.appId = appId;
+				return formData;
+			})
+		})
+		var postFrom = function(extrData){
+			$.ajax({
+				url:'editorSyn',
+				dataType:"json",
+				data:extrData(),
+				type:"POST",
+				success:function(data){
+					alert(data)
+				}
+			})
+		}
+		var checkForm = function(name){ //jquery获取复选框值 
+			var chk_value =[]; 
+			$('input[name="'+name+'"]:checked').each(function(){ 
+				chk_value.push($(this).val());
+			}); 
+			return chk_value.join(",");
+		}
 	})
 	/*]]>*/
 </script>

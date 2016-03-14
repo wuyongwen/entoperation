@@ -8,18 +8,6 @@ import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import me.chanjar.weixin.common.api.WxConsts;
-import me.chanjar.weixin.common.bean.result.WxMediaUploadResult;
-import me.chanjar.weixin.common.exception.WxErrorException;
-import me.chanjar.weixin.common.util.fs.FileUtils;
-import me.chanjar.weixin.mp.api.WxMpInMemoryConfigStorage;
-import me.chanjar.weixin.mp.api.WxMpService;
-import me.chanjar.weixin.mp.bean.WxMpMassGroupMessage;
-import me.chanjar.weixin.mp.bean.WxMpMaterial;
-import me.chanjar.weixin.mp.bean.WxMpMaterialNews;
-import me.chanjar.weixin.mp.bean.result.WxMpMassSendResult;
-import me.chanjar.weixin.mp.bean.result.WxMpMaterialUploadResult;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +30,6 @@ import com.chn.wx.MessageHandler;
 import com.chn.wx.api.PlatFormManager;
 import com.chn.wx.dto.Context;
 import com.chn.wx.store.PlatformConfigYamlStorage;
-import com.chn.wx.vo.result.PlatFormAccessTokenResult;
 import com.chn.wx.vo.result.PlatFormGetAuthAccessResult;
 import com.chn.wx.vo.result.PlatFormGetAuthInfoResult;
 import com.chn.wx.vo.result.PlatFormGetAuthorizerInfoResult;
@@ -51,6 +38,18 @@ import com.entgroup.wxplatform.entoperation.domain.WxMpAPP;
 import com.entgroup.wxplatform.entoperation.domain.WxMpAPPInfo;
 import com.entgroup.wxplatform.entoperation.services.UserService;
 import com.entgroup.wxplatform.entoperation.services.WxMpAppService;
+
+import me.chanjar.weixin.common.api.WxConsts;
+import me.chanjar.weixin.common.exception.WxErrorException;
+import me.chanjar.weixin.common.util.fs.FileUtils;
+import me.chanjar.weixin.mp.api.WxMpInMemoryConfigStorage;
+import me.chanjar.weixin.mp.api.WxMpService;
+import me.chanjar.weixin.mp.bean.WxMpMassGroupMessage;
+import me.chanjar.weixin.mp.bean.WxMpMaterial;
+import me.chanjar.weixin.mp.bean.WxMpMaterialNews;
+import me.chanjar.weixin.mp.bean.WxMpMaterialNewsArticle;
+import me.chanjar.weixin.mp.bean.result.WxMpMassSendResult;
+import me.chanjar.weixin.mp.bean.result.WxMpMaterialUploadResult;
 
 /**
  * 微信平台请求处理Controller
@@ -224,7 +223,7 @@ public class WechatPlatformController {
 		
 		 // 单图文消息
 	    WxMpMaterialNews wxMpMaterialNewsSingle = new WxMpMaterialNews();
-	    WxMpMaterialNews.WxMpMaterialNewsArticle mpMaterialNewsArticleSingle = new WxMpMaterialNews.WxMpMaterialNewsArticle();
+	    WxMpMaterialNewsArticle mpMaterialNewsArticleSingle = new WxMpMaterialNewsArticle();
 	    mpMaterialNewsArticleSingle.setAuthor("author");
 	    mpMaterialNewsArticleSingle.setThumbMediaId(mediaId);
 	    mpMaterialNewsArticleSingle.setTitle("single title");
