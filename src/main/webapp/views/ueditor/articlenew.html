@@ -215,7 +215,9 @@
 			return 'upload';
 			//} else if (action == 'uploadvideo') {
 			//return 'http://a.b.com/video.php';
-		} else {
+		} else if(action == 'catchimage'){
+			return "uploadCatcherImg";
+		}else{
 			return this._bkGetActionUrl.call(this, action);
 		}
 	}

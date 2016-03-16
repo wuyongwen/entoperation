@@ -1,5 +1,6 @@
 package com.entgroup.wxplatform.entoperation.controllers;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -31,9 +32,12 @@ import com.baidu.ueditor.define.ActionMap;
 import com.baidu.ueditor.define.AppInfo;
 import com.baidu.ueditor.define.BaseState;
 import com.baidu.ueditor.define.FileType;
+import com.baidu.ueditor.define.MultiState;
 import com.baidu.ueditor.define.State;
 import com.baidu.ueditor.upload.StorageManager;
 import com.baidu.ueditor.upload.Uploader;
+import com.chn.common.HttpUtils;
+import com.chn.common.IOUtils;
 import com.chn.common.StringUtils;
 import com.chn.wx.api.PlatFormManager;
 import com.chn.wx.vo.result.BasicResult;
@@ -168,6 +172,32 @@ public class UeditorController {
 
 		return storageState.toJSONString();
 	}
+	
+	@RequestMapping(value="uploadCatcherImg",method=RequestMethod.POST)
+	@ResponseBody
+	public String uploadCatcherImg(HttpServletRequest request) throws WxErrorException{
+		String rootPath = request.getServletContext().getRealPath("/") +"views";
+		ConfigManager confMgr = ConfigManager.getInstance(rootPath, request.getContextPath(), request.getRequestURI() );
+		Map<String, Object> conf = confMgr.getConfig( ActionMap.CATCH_IMAGE);
+		String[] list = request.getParameterValues( (String)conf.get( "fieldName" ) );
+		MultiState state = new MultiState( true );
+		for ( String source : list) {
+			state.addState( captureRemoteData( source ) );
+		}
+		return state.toJSONString();
+	}
+	private State captureRemoteData(String source) throws WxErrorException {
+		File file = HttpUtils.downloadFile(source);
+		initTokenConfig("wx34dcba427f62a33e");
+		String rest = wxMpService.imageUpload(file);
+		State state = new BaseState(true);
+		state.putInfo( "size", file.length());
+		state.putInfo( "title", file.getName());
+		state.putInfo( "url", PathFormat.format(JSON.parseObject(rest).getString("url")) );
+		state.putInfo( "source", source );
+		return state;
+	}
+
 	private void initTokenConfig(String appid) {
 		WxMpAPP app = mpsvr.findByAppId(appid);
 		if (app.isExpriesIn()) {
